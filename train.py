@@ -4,6 +4,7 @@ import torch.optim as optim
 from torchvision import datasets,transforms
 from torch.utils import data as Data
 import os
+import re
 
 
 def train(model, optmizer_list, criteon ,log_dir, batch_size=2500, epochs=100):
@@ -71,7 +72,7 @@ def train(model, optmizer_list, criteon ,log_dir, batch_size=2500, epochs=100):
         file_dir = log_dir + str(epoch)
         os.mkdir(file_dir)
         save_model(model, file_dir+"/model_parameter.pkl" )
-        gen_log(file_dir+"/log.txt", log, test_loss, correct, len(test_loader.dataset))
+        gen_log(file_dir+"/log.txt", log, loss, test_loss, correct, len(test_loader.dataset))
         
 
 
@@ -98,7 +99,7 @@ def eval(model, test_loader, criteon):
 
     test_loss /= len(test_loader.dataset)
     # 打印输出测试误差及准确率
-    print('\n测试集: Average loss: {:.4f}, Accuracy: {}/{} ({:.0f}%)\n'.format(
+    print('\nTest set: Average loss: {:.4f}, Accuracy: {}/{} ({:.0f}%)\n'.format(
         test_loss, correct, len(test_loader.dataset),
         100. * correct / len(test_loader.dataset)))
     
@@ -114,8 +115,34 @@ def save_model(model,file_path):
 
 
 
-def gen_log(file_path, log, test_loss, correct, data_len):
+def gen_log(file_path, log, train_loss, test_loss, correct, data_len):
     with open(file_path,"w") as f:
-        f.writelines(log+ ['\ntest set: Average loss: {:.4f}, Accuracy: {}/{} ({:.0f}%)\n'.format(
-        test_loss, correct, data_len,
+        f.writelines(log+ ['\nTest set: Total loss: [{:.8f}] Average loss: [{:.8f}], Accuracy: {}/{} [{:.4f}%]\n'.format(
+        train_loss.item(), test_loss, correct, data_len,
         100. * correct / data_len)])
+
+
+def load_log(log_dir):
+    folder_name = os.listdir(log_dir)
+    folder_name.sort(key=lambda x: int(x))
+    log_name = "log.txt"
+
+    losses = []
+    accuracies = []
+    epochs = []
+
+    for name in folder_name:
+        log_path = os.path.join(log_dir,name,log_name)
+        with open(log_path, "r") as f:
+            lines = f.readlines()
+            evaluate = lines[-1]
+            res = re.findall("\\[.*?\\]",evaluate)
+            data = [i[1:-1] for i in res]
+            data[-1] = data[-1][:-1]
+            data = [float(i) for i in data]
+            loss, _, accuracy =  data
+            losses.append(loss)
+            accuracies.append(accuracy)
+            epochs.append(float(name))
+
+    return epochs, losses, accuracies  
