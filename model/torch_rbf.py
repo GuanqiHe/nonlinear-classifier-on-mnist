@@ -26,12 +26,15 @@ class RBFClassifier(nn.Module):
 
 class RBF(nn.Module):
 
-    def __init__(self, in_features, out_features, basis_func):
+    def __init__(self, in_features, out_features, basis_func, centres_init=None):
         super(RBF, self).__init__()
         self.in_features = in_features
         self.out_features = out_features
-        self.centres = nn.Parameter(torch.randn(out_features, in_features))
-        self.log_sigmas = nn.Parameter(torch.randn(out_features))
+        if centres_init is not None:
+            self.centres = nn.Parameter(torch.Tensor(centres_init))
+        else:
+            self.centres = nn.Parameter(torch.randn(out_features, in_features))
+        self.log_sigmas = nn.Parameter(torch.ones(out_features))
         self.basis_func = basis_func
         self.reset_parameters()
 
@@ -43,7 +46,8 @@ class RBF(nn.Module):
         size = (input.size(0), self.out_features, self.in_features)
         x = input.unsqueeze(1).expand(size)
         c = self.centres.unsqueeze(0).expand(size)
-        distances = (x - c).pow(2).sum(-1).pow(0.5) / torch.exp(self.log_sigmas).unsqueeze(0)
+        distances = (x - c).pow(2).sum(-1).pow(0.5) / torch.exp(self.log_sigmas).unsqueeze(0) / float(self.out_features)
+        # print(distances)
         return self.basis_func(distances)
     
     def L1_term():
