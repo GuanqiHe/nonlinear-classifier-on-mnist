@@ -1,0 +1,5 @@
+__pycache__/
+.history/
+data/
+log/
+log*
