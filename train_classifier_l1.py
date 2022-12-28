@@ -21,7 +21,7 @@ if __name__=='__main__':
 
     #MNIST 数据集
     #设置训练的批次大小、学习率、及训练代数
-    batch_size=5000
+    batch_size=2000
     learning_rate=0.005
     epochs=100
 

@@ -21,7 +21,7 @@ def train(model, optmizer_list, criteon ,log_dir, batch_size=2500, epochs=100):
             transforms.ToTensor(),
             transforms.Normalize((0.1307,), (0.3081,))
         ])),
-        batch_size=batch_size, shuffle=True, num_workers=2)
+        batch_size=batch_size, shuffle=True, num_workers=1)
 
     if torch.cuda.is_available():
         model = model.cuda()
@@ -72,7 +72,7 @@ def train(model, optmizer_list, criteon ,log_dir, batch_size=2500, epochs=100):
         file_dir = log_dir + str(epoch)
         os.mkdir(file_dir)
         save_model(model, file_dir+"/model_parameter.pkl" )
-        gen_log(file_dir+"/log.txt", log, loss, test_loss, correct, len(test_loader.dataset))
+        gen_log(file_dir+"/log.txt", log, data_loss, test_loss, correct, len(test_loader.dataset))
         
 
 

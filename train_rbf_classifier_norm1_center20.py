@@ -15,8 +15,8 @@ load_weights = False
 log_dir = "./log/pos1_norm2_2022_12_23_17_31_44_928448/"
 file_dir = log_dir + "8/"
 # init = "sample"
-# init = "none"
-init = "kmeans"
+init = "none"
+# init = "kmeans"
 
 
 
@@ -39,8 +39,8 @@ if __name__=='__main__':
 
     layer_widths = [28*28, 10]
     layer_centres = [20]
-    basis_func = poisson_one
-    dist_func = norm_two
+    basis_func = linear
+    dist_func = norm_one
 
     model = RBFClassifier(layer_widths, layer_centres, basis_func, dist_func, initial_centres, 1e-2)
     # model = Classifier(28*28, 10)
@@ -54,7 +54,7 @@ if __name__=='__main__':
 
 
     # 保存模型参数到路径"./data/model_parameter.pkl"
-    log_dir = "./log/"+"pos1_norm2_KmeansInit_"+str(datetime.datetime.now()).replace(" ","_").replace(":","_").replace(".","_").replace("-","_")+"/"
+    log_dir = "./log/"+"norm1_"+str(datetime.datetime.now()).replace(" ","_").replace(":","_").replace(".","_").replace("-","_")+"/"
     os.mkdir(log_dir)
 
     criteon = nn.CrossEntropyLoss()
